@@ -4,10 +4,10 @@
     "slug": "hello",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/ogslogo.png",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/splash.png",
+      "image": "./assets/ogslogo.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },

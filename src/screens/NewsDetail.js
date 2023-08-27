@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect,useRef } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import DeveloperMenu from './commentSection';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -16,6 +16,17 @@ const NewsDetailScreen = ({ route, navigation }) => {
         sentiment: "",
         link: ""
     });
+    const [random,SetRandom]=useState();
+    const timeoutRef = useRef(null);
+    const [visible, setVisible] = useState(false)
+    const closeAlert = () => {
+        setVisible(false);
+    }
+    const showAlert = () => {
+        setVisible(true);
+        clearTimeout(timeoutRef.current)
+        timeoutRef.current = setTimeout(closeAlert, 4000);
+    }
     const [totalComments, setTotalComments] = useState();
     const [developerMenuVisible, setDeveloperMenuVisible] = useState(false);
     const [isModalVisible, setIsModalVisible] = useState(false);
@@ -42,8 +53,6 @@ const NewsDetailScreen = ({ route, navigation }) => {
     const fetchNews = async () => {
         try {
             const token = await AsyncStorage.getItem('UserToken');
-            console.log(token);
-
             if (!token) {
                 console.log('token not available');
                 return;
@@ -73,17 +82,68 @@ const NewsDetailScreen = ({ route, navigation }) => {
                 link: data[1].url,
             });
             console.log(data[1]);
+            setPassid("");
             setPassid(data[1]._id)
-
         } catch (error) {
             console.error(error.message);
         }
     };
+    const [dat, setDat] = useState({
+      title: "",
+      comment: "",
+      news:""
+  })
+  const [successMessage, setSuccessMessage] = useState('');
+  const handleAddComment = async () => {
+      const token = await AsyncStorage.getItem('UserToken');
+      console.log("news id"+id)
+      console.log("data to be sent",dat)
+      if (!token) {
+          console.log('token not available');
+          return;
+      }
+      const methodOptions = {
+          method: "POST",
+          body: JSON.stringify(dat),
+          headers: {
+              'Content-Type': 'application/json',
+              'x-auth-token': token,
+          },
+      };
+      fetch("http://192.168.43.236:8000/api/user/addreview", methodOptions)
+          .then((response) => {
+              console.log(response.status)
+              if (!response.ok) {
+                  if (response.status === 500) {
+                      console.log(response.json)
+                  }
+              }
+              else {
+                  if (response.ok) {
+                      setSuccessMessage("Comment added successfully!");
+                      showAlert()
+                      const ra= Math.random() * (10 - 1) + 1;
+                      SetRandom(ra);
+                       
+                  }
+              }
+          })
+          .catch((error) => {
+              console.log(error);
+          });
+  }
 
     useEffect(() => {
         fetchNews();
-    }, [id]);
-
+        
+    }, [id,random]);
+    useEffect(() => {
+      // Update dat.news whenever passid changes
+      setDat({
+          ...dat,
+          news: passid
+      });
+  }, [passid]);
     // const handleSeeComments = () => {
     //     navigation.navigate('news review', { comments: reviews, total: totalComments }); // Pass the reviews array as a parameter
     // };
@@ -116,7 +176,11 @@ const NewsDetailScreen = ({ route, navigation }) => {
       <AddCommentModal
         visiblee={isModalVisible}
         onClose={handleModalClose}
-        newsid={id}
+        handleAddComment={handleAddComment}
+        successMessage={successMessage}
+        visible={visible}
+        data={dat}
+        setData={setDat}
       />
         </ScrollView>
         

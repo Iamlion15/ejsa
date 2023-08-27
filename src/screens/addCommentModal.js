@@ -2,64 +2,8 @@ import React, { useState,useRef } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Modal } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const AddCommentModal = ({ visiblee, onClose,newsid }) => {
-    const news  = newsid
-    const timeoutRef = useRef(null);
-    const [visible, setVisible] = useState(false)
-    const closeAlert = () => {
-        setVisible(false);
-    }
-    const showAlert = () => {
-        setVisible(true);
-        clearTimeout(timeoutRef.current)
-        timeoutRef.current = setTimeout(closeAlert, 4000);
-    }
-    const [data, setData] = useState({
-        title: "",
-        comment: "",
-        news: news,
-    })
-    console.log("news id: "+data.news)
-    console.log(news);
-    const [successMessage, setSuccessMessage] = useState('');
-    const handleAddComment = async () => {
-        const token = await AsyncStorage.getItem('UserToken');
-        console.log(token);
-        // setData({...data,news:news})
-        console.log(data)
-        if (!token) {
-            console.log('token not available');
-            return;
-        }
-        console.log("before sendind news id "+data.news)
-        const methodOptions = {
-            method: "POST",
-            body: JSON.stringify(data),
-            headers: {
-                'Content-Type': 'application/json',
-                'x-auth-token': token,
-            },
-        };
-        fetch("http://192.168.43.236:8000/api/user/addreview", methodOptions)
-            .then((response) => {
-                console.log(response.status)
-                if (!response.ok) {
-                    if (response.status === 500) {
-                        console.log(response)
-                    }
-                }
-                else {
-                    if (response.ok) {
-                        setSuccessMessage("Comment added successfully!");
-                        showAlert()
-                        //navigation.goBack();    
-                    }
-                }
-            })
-            .catch((error) => {
-                console.log(error);
-            });
-    }
+const AddCommentModal = ({ visiblee, onClose,visible,handleAddComment,successMessage,data,setData }) => {
+    
   return (
     <Modal
       animationType="slide"

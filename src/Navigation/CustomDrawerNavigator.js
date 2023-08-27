@@ -28,7 +28,7 @@ function CustomDrawerContent(props) {
                 forceInset={{ top: "always", horizontal: "never" }}
             >
                 <Block flex={0.06} style={styles.header}>
-                    <Text>ELECTRONIC JOURNA SENTIMENT ANALYSIS</Text>
+                    <Text>ELECTRONIC JOURNAL SENTIMENT ANALYSIS</Text>
                 </Block>
                 <Block flex style={{ paddingLeft: 8, paddingRight: 14 }}>
                     <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
